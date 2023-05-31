@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block titulo %} Inicio {% endblock %}
+
+{% block contenido %}
+
+<!--Estilos y Scripts para menu de gráficos-->
+<style>
+  .contenido {
+    display: none;
+  }
+
+  .contenido.mostrado {
+    display: block;
+  }
+
+  a {
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+  }
+
+  a.activo {
+    text-decoration: none;
+    font-weight: bold;
+  }
+</style>
+
+<!--Scripts para el menu de gráficos-->
+<script>
+  var enlaceActivo = null;
+
+  function ocultarContenidos() {
+    // Ocultar todos los contenidos
+    var contenidos = document.querySelectorAll('.contenido');
+    contenidos.forEach(function (elemento) {
+      elemento.classList.remove("mostrado");
+    });
+
+    // Quitar la clase "activo" del enlace anterior
+    if (enlaceActivo) {
+      enlaceActivo.classList.remove("activo");
+    }
+  }
+
+  function mostrarContenido(idContenido) {
+    var contenido = document.getElementById(idContenido);
+    var enlace = document.querySelector('a.activo');
+
+    // Ocultar todos los contenidos
+    var contenidos = document.querySelectorAll('.contenido');
+    contenidos.forEach(function (elemento) {
+      elemento.classList.remove("mostrado");
+    });
+
+    // Quitar la clase "activo" del enlace anterior
+    if (enlace) {
+      enlace.classList.remove("activo");
+    }
+
+    // Mostrar el contenido seleccionado
+    contenido.classList.add("mostrado");
+    enlaceActivo = enlace;
+
+    // Agregar la clase "activo" al enlace actual
+    var enlaceActual = document.querySelector('a[href="#' + idContenido + '"]');
+    enlaceActual.classList.add("activo");
+  }
+</script>
+
+<!--Gráficos y análisis-->
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">Gráficos</h5>
+      </div>
+      <!--Menu-->
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a href="#" onclick="mostrarContenido('contenido1')" class="nav-link">Gráfico 1</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" onclick="mostrarContenido('contenido2')" class="nav-link">Gráfico 2</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" onclick="mostrarContenido('contenido3')" class="nav-link">Gráfico 3</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" onclick="ocultarContenidos()" class="nav-link">Ocultar gráficos</a>
+          </li>
+        </ul>
+      </div>
+      <!--Gráficos-->
+      <div id="contenido1" class="contenido">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="card-body">
+            {{ graph_1|safe }}
+          </div>
+        </div>
+      </div>
+      <div id="contenido2" class="contenido">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="card-body">
+            {{ graph_2|safe }}
+          </div>
+        </div>
+      </div>
+      <div id="contenido3" class="contenido">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="card-body">
+            {{ graph_3|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Análisis-->
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">Análisis</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Analiza......</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<!--Tabla-->
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title">Información sobre Estudiantes con Discapacidad que ingresan a Estudios Superiores</h5>
+  </div>
+  <div class="card-body">
+    {% if user.is_authenticated %}
+    <a name="" id="" class="btn btn-outline-primary" href="{% url 'crear' %}" role="button"
+      title="Agrega información sobre la cantidad de estudiantes">Agregar información</a>
+    <!--<h1 class="display-5 fw-bold">Total General: </h1>-->
+    {% endif %}
+    <div id="myTable" class="table-responsive">
+
+      <br>
+
+      <table class="table table-sm table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <!--<th scope="col">ID</th>   -->
+            <th scope="col">Universidad</th>
+            <th scope="col">Cant. Física</th>
+            <th scope="col">Cant. Intelectual</th>
+            <th scope="col">Cant. Sensorial</th>
+            <th scope="col">Cant. Mental</th>
+            <th scope="col">Cant. Masculinos</th>
+            <th scope="col">Cant. Femeninos</th>
+            <th scope="col">Total</th>
+
+            {% if user.is_authenticated %}
+            <th scope="col">Acciones</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for estudiante in estudiantes %}
+          <tr>
+            <!--<td>{{ estudiante.id }}</td>-->
+            <td>{{ estudiante.universidad }}</td>
+            <td>{{ estudiante.cantFisica }}</td>
+            <td>{{ estudiante.cantIntelectual }}</td>
+            <td>{{ estudiante.cantSensorial }}</td>
+            <td>{{ estudiante.cantMental }}</td>
+            <td>{{ estudiante.cantMasculino }}</td>
+            <td>{{ estudiante.cantFemenino }}</td>
+            <td>{{ estudiante.cantTotal }}</td>
+            {% if user.is_authenticated %}
+            <td>
+              <a class="btn btn-outline-primary" href="{% url 'editar' estudiante.id %}" role="button">Editar</a>
+              <a class="btn btn-outline-danger" href="#" role="button"
+                onclick="eliminarEstudiante({{ estudiante.id }})">Borrar</a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--Script para la notificación de eliminar-->
+<script>
+  function eliminarEstudiante(id) {
+    Swal.fire({
+      "title": "Estas seguro?",
+      "text": "Esta acción no se puede deshacer",
+      "icon": "question",
+      "showCancelButton": true,
+      "cancelButtonText": "No, Cancelar",
+      "confirmButtonText": "Si, Eliminar",
+      "reverseButtons": true,
+      "confirmButtonColor": "red"
+    })
+      .then(function (result) {
+        if (result.isConfirmed) {
+          window.location.href = "eliminar/" + id
+        }
+      })
+  }  
+</script>
+{% endblock %}

@@ -1,0 +1,2 @@
+Solo me falta agregar un boton de cerrar en el menu de graficos
+Y medificar las notificaciones para URL prohibidas
